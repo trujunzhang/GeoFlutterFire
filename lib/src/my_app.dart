@@ -1,9 +1,10 @@
-import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:ieatta/GeoFlutterFire/geoflutterfire.dart';
 import 'package:ieatta/GeoFlutterFire/point.dart';
-import 'package:rxdart/rxdart.dart';
+
+import 'services/restaurants.dart';
 import 'streambuilder_test.dart';
 
 class MyApp extends StatefulWidget {
@@ -15,11 +16,7 @@ class _MyAppState extends State<MyApp> {
   GoogleMapController _mapController;
   TextEditingController _latitudeController, _longitudeController;
 
-  // firestore init
-  Firestore _firestore = Firestore.instance;
-  Geoflutterfire geo;
-  Stream<List<DocumentSnapshot>> stream;
-  var radius = BehaviorSubject<double>.seeded(1.0);
+  Restaurants restaurants = Restaurants();
   Map<MarkerId, Marker> markers = <MarkerId, Marker>{};
 
   @override
@@ -28,30 +25,13 @@ class _MyAppState extends State<MyApp> {
     _latitudeController = TextEditingController();
     _longitudeController = TextEditingController();
 
-    geo = Geoflutterfire();
-    GeoFirePoint center = geo.point(latitude: 12.960632, longitude: 77.641603);
-    stream = radius.switchMap((rad) {
-      var collectionReference = _firestore.collection('locations');
-//          .where('name', isEqualTo: 'darshan');
-      return geo.collection(collectionRef: collectionReference).within(
-          center: center, radius: rad, field: 'position', strictMode: true);
-
-      /*
-      ****Example to specify nested object****
-
-      var collectionReference = _firestore.collection('nestedLocations');
-//          .where('name', isEqualTo: 'darshan');
-      return geo.collection(collectionRef: collectionReference).within(
-          center: center, radius: rad, field: 'address.location.position');
-
-      */
-    });
+    restaurants.init();
   }
 
   @override
   void dispose() {
     super.dispose();
-    radius.close();
+    restaurants.dispose();
   }
 
   @override
@@ -65,8 +45,8 @@ class _MyAppState extends State<MyApp> {
               onPressed: _mapController == null
                   ? null
                   : () {
-                _showHome();
-              },
+                      _showHome();
+                    },
               icon: Icon(Icons.home),
             )
           ],
@@ -147,7 +127,7 @@ class _MyAppState extends State<MyApp> {
                     onPressed: () {
                       double lat = double.parse(_latitudeController.text);
                       double lng = double.parse(_longitudeController.text);
-                      _addPoint(lat, lng);
+                      restaurants.addPoint(lat, lng);
                     },
                     child: Text(
                       'ADD',
@@ -165,7 +145,7 @@ class _MyAppState extends State<MyApp> {
                 onPressed: () {
                   double lat = double.parse(_latitudeController.text);
                   double lng = double.parse(_longitudeController.text);
-                  _addNestedPoint(lat, lng);
+                  restaurants.addNestedPoint(lat, lng);
                 },
               )
             ],
@@ -180,7 +160,7 @@ class _MyAppState extends State<MyApp> {
       _mapController = controller;
 //      _showHome();
       //start listening after map is created
-      stream.listen((List<DocumentSnapshot> documentList) {
+      restaurants.stream.listen((List<DocumentSnapshot> documentList) {
         _updateMarkers(documentList);
       });
     });
@@ -193,28 +173,6 @@ class _MyAppState extends State<MyApp> {
         zoom: 15.0,
       ),
     ));
-  }
-
-  void _addPoint(double lat, double lng) {
-    GeoFirePoint geoFirePoint = geo.point(latitude: lat, longitude: lng);
-    _firestore
-        .collection('locations')
-        .add({'name': 'random name', 'position': geoFirePoint.data}).then((_) {
-      print('added ${geoFirePoint.hash} successfully');
-    });
-  }
-
-  //example to add geoFirePoint inside nested object
-  void _addNestedPoint(double lat, double lng) {
-    GeoFirePoint geoFirePoint = geo.point(latitude: lat, longitude: lng);
-    _firestore.collection('nestedLocations').add({
-      'name': 'random name',
-      'address': {
-        'location': {'position': geoFirePoint.data}
-      }
-    }).then((_) {
-      print('added ${geoFirePoint.hash} successfully');
-    });
   }
 
   void _addMarker(double lat, double lng) {
@@ -246,7 +204,6 @@ class _MyAppState extends State<MyApp> {
       _label = '${_value.toInt().toString()} kms';
       markers.clear();
     });
-    radius.add(value);
+    restaurants.changed(value);
   }
 }
-
