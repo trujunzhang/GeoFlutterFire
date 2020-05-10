@@ -36,6 +36,98 @@ class _MyAppState extends State<MyApp> {
 
   @override
   Widget build(BuildContext context) {
+    var mapLayer = Center(
+      child: Card(
+        elevation: 4,
+        margin: EdgeInsets.symmetric(vertical: 8),
+        child: SizedBox(
+          width: MediaQuery.of(context).size.width,
+          height: MediaQuery.of(context).size.height,
+          child: GoogleMap(
+            onMapCreated: _onMapCreated,
+            initialCameraPosition: const CameraPosition(
+              target: LatLng(12.960632, 77.641603),
+              zoom: 15.0,
+            ),
+            markers: Set<Marker>.of(markers.values),
+          ),
+        ),
+      ),
+    );
+    var row = Row(
+      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+      children: <Widget>[
+        Container(
+          width: 100,
+          child: TextField(
+            controller: _latitudeController,
+            keyboardType: TextInputType.number,
+            textInputAction: TextInputAction.next,
+            decoration: InputDecoration(
+                labelText: 'lat',
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(8),
+                )),
+          ),
+        ),
+        Container(
+          width: 100,
+          child: TextField(
+            controller: _longitudeController,
+            keyboardType: TextInputType.number,
+            decoration: InputDecoration(
+                labelText: 'lng',
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(8),
+                )),
+          ),
+        ),
+        MaterialButton(
+          color: Colors.blue,
+          onPressed: () {
+            double lat = double.parse(_latitudeController.text);
+            double lng = double.parse(_longitudeController.text);
+            restaurants.addPoint(lat, lng);
+          },
+          child: Text(
+            'ADD',
+            style: TextStyle(color: Colors.white),
+          ),
+        )
+      ],
+    );
+    var fgLayer = Column(
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: <Widget>[
+        Spacer(),
+        Padding(
+          padding: const EdgeInsets.only(top: 8.0),
+          child: Slider(
+            min: 1,
+            max: 200,
+            divisions: 4,
+            value: _value,
+            label: _label,
+            activeColor: Colors.blue,
+            inactiveColor: Colors.blue.withOpacity(0.2),
+            onChanged: (double value) => changed(value),
+          ),
+        ),
+        row,
+        MaterialButton(
+          color: Colors.amber,
+          child: Text(
+            'Add nested ',
+            style: TextStyle(color: Colors.white),
+          ),
+          onPressed: () {
+            double lat = double.parse(_latitudeController.text);
+            double lng = double.parse(_longitudeController.text);
+            restaurants.addNestedPoint(lat, lng);
+          },
+        )
+      ],
+    );
     return MaterialApp(
       home: Scaffold(
         appBar: AppBar(
@@ -59,97 +151,25 @@ class _MyAppState extends State<MyApp> {
           },
           child: Icon(Icons.navigate_next),
         ),
-        body: Container(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: <Widget>[
-              Center(
-                child: Card(
-                  elevation: 4,
-                  margin: EdgeInsets.symmetric(vertical: 8),
-                  child: SizedBox(
-                    width: MediaQuery.of(context).size.width - 30,
-                    height: MediaQuery.of(context).size.height * (1 / 3),
-                    child: GoogleMap(
-                      onMapCreated: _onMapCreated,
-                      initialCameraPosition: const CameraPosition(
-                        target: LatLng(12.960632, 77.641603),
-                        zoom: 15.0,
-                      ),
-                      markers: Set<Marker>.of(markers.values),
-                    ),
-                  ),
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.only(top: 8.0),
-                child: Slider(
-                  min: 1,
-                  max: 200,
-                  divisions: 4,
-                  value: _value,
-                  label: _label,
-                  activeColor: Colors.blue,
-                  inactiveColor: Colors.blue.withOpacity(0.2),
-                  onChanged: (double value) => changed(value),
-                ),
-              ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: <Widget>[
-                  Container(
-                    width: 100,
-                    child: TextField(
-                      controller: _latitudeController,
-                      keyboardType: TextInputType.number,
-                      textInputAction: TextInputAction.next,
-                      decoration: InputDecoration(
-                          labelText: 'lat',
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(8),
-                          )),
-                    ),
-                  ),
-                  Container(
-                    width: 100,
-                    child: TextField(
-                      controller: _longitudeController,
-                      keyboardType: TextInputType.number,
-                      decoration: InputDecoration(
-                          labelText: 'lng',
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(8),
-                          )),
-                    ),
-                  ),
-                  MaterialButton(
-                    color: Colors.blue,
-                    onPressed: () {
-                      double lat = double.parse(_latitudeController.text);
-                      double lng = double.parse(_longitudeController.text);
-                      restaurants.addPoint(lat, lng);
-                    },
-                    child: Text(
-                      'ADD',
-                      style: TextStyle(color: Colors.white),
-                    ),
-                  )
-                ],
-              ),
-              MaterialButton(
-                color: Colors.amber,
-                child: Text(
-                  'Add nested ',
-                  style: TextStyle(color: Colors.white),
-                ),
-                onPressed: () {
-                  double lat = double.parse(_latitudeController.text);
-                  double lng = double.parse(_longitudeController.text);
-                  restaurants.addNestedPoint(lat, lng);
-                },
-              )
-            ],
-          ),
+        body: Stack(
+          children: <Widget>[
+            mapLayer,
+    Container(
+    child: Column(
+      children: <Widget>[
+        Spacer(),
+        Container(
+          color: Colors.white,
+          height: 240,
+        )
+      ],
+    ),
+    ),
+    Container(
+              margin: const EdgeInsets.only(bottom: 60),
+              child: fgLayer,
+            )
+          ],
         ),
       ),
     );
