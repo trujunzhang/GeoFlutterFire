@@ -1,8 +1,9 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'services/restaurants.dart';
-import 'streambuilder_test.dart';
+import '../services/restaurants.dart';
+import '../streambuilder_test.dart';
+import 'google_map_view.dart';
 
 class MyApp extends StatefulWidget {
   @override
@@ -13,29 +14,11 @@ class _MyAppState extends State<MyApp> {
   GoogleMapController _mapController;
   TextEditingController _latitudeController, _longitudeController;
 
-  Map<MarkerId, Marker> markers = <MarkerId, Marker>{};
-
   @override
   void initState() {
     super.initState();
     _latitudeController = TextEditingController();
     _longitudeController = TextEditingController();
-
-    MarkerId markerId = MarkerId(restaurants.center.latitude.toString() +
-        restaurants.center.longitude.toString());
-    final marker = Marker(
-      markerId: markerId,
-      position: restaurants.center,
-      infoWindow: InfoWindow(
-        title: "name",
-        snippet: "address",
-      ),
-      icon: BitmapDescriptor.defaultMarker,
-      onTap: () {
-        var x = 0;
-      },
-    );
-    markers[markerId] = marker;
 
     restaurants.init();
   }
@@ -48,24 +31,6 @@ class _MyAppState extends State<MyApp> {
 
   @override
   Widget build(BuildContext context) {
-    var mapLayer = Center(
-      child: Card(
-        elevation: 4,
-        margin: EdgeInsets.symmetric(vertical: 8),
-        child: SizedBox(
-          width: MediaQuery.of(context).size.width,
-          height: MediaQuery.of(context).size.height,
-          child: GoogleMap(
-            onMapCreated: _onMapCreated,
-            initialCameraPosition: CameraPosition(
-              target: restaurants.center,
-              zoom: 15.0,
-            ),
-            markers: Set<Marker>.of(markers.values),
-          ),
-        ),
-      ),
-    );
     var row = Row(
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       children: <Widget>[
@@ -165,7 +130,7 @@ class _MyAppState extends State<MyApp> {
         ),
         body: Stack(
           children: <Widget>[
-            mapLayer,
+            GoogleMapView(),
             Container(
               child: Column(
                 children: <Widget>[
@@ -187,45 +152,45 @@ class _MyAppState extends State<MyApp> {
     );
   }
 
-  void _onMapCreated(GoogleMapController controller) {
-    setState(() {
-      _mapController = controller;
-//      _showHome();
-      //start listening after map is created
-      restaurants.stream.listen((List<DocumentSnapshot> documentList) {
-        _updateMarkers(documentList);
-      });
-    });
-  }
+//  void _onMapCreated(GoogleMapController controller) {
+//    setState(() {
+//      _mapController = controller;
+////      _showHome();
+//      //start listening after map is created
+//      restaurants.stream.listen((List<DocumentSnapshot> documentList) {
+//        _updateMarkers(documentList);
+//      });
+//    });
+//  }
 
   void _showHome() {
-    _mapController.animateCamera(CameraUpdate.newCameraPosition(
-      const CameraPosition(
-        target: LatLng(12.960632, 77.641603),
-        zoom: 15.0,
-      ),
-    ));
+//    _mapController.animateCamera(CameraUpdate.newCameraPosition(
+//      const CameraPosition(
+//        target: LatLng(12.960632, 77.641603),
+//        zoom: 15.0,
+//      ),
+//    ));
   }
 
-  void _addMarker(double lat, double lng) {
-    MarkerId id = MarkerId(lat.toString() + lng.toString());
-    Marker _marker = Marker(
-      markerId: id,
-      position: LatLng(lat, lng),
-      icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueViolet),
-      infoWindow: InfoWindow(title: 'latLng', snippet: '$lat,$lng'),
-    );
-    setState(() {
-      markers[id] = _marker;
-    });
-  }
+//  void _addMarker(double lat, double lng) {
+//    MarkerId id = MarkerId(lat.toString() + lng.toString());
+//    Marker _marker = Marker(
+//      markerId: id,
+//      position: LatLng(lat, lng),
+//      icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueViolet),
+//      infoWindow: InfoWindow(title: 'latLng', snippet: '$lat,$lng'),
+//    );
+//    setState(() {
+//      markers[id] = _marker;
+//    });
+//  }
 
-  void _updateMarkers(List<DocumentSnapshot> documentList) {
-    documentList.forEach((DocumentSnapshot document) {
-      GeoPoint point = document.data['position']['geopoint'];
-      _addMarker(point.latitude, point.longitude);
-    });
-  }
+//  void _updateMarkers(List<DocumentSnapshot> documentList) {
+//    documentList.forEach((DocumentSnapshot document) {
+//      GeoPoint point = document.data['position']['geopoint'];
+//      _addMarker(point.latitude, point.longitude);
+//    });
+//  }
 
   double _value = 20.0;
   String _label = '';
@@ -234,7 +199,7 @@ class _MyAppState extends State<MyApp> {
     setState(() {
       _value = value;
       _label = '${_value.toInt().toString()} kms';
-      markers.clear();
+//      markers.clear();
     });
     restaurants.changed(value);
   }

@@ -12,10 +12,36 @@ class Restaurants {
   var radius = BehaviorSubject<double>.seeded(1.0);
 
   final LatLng center = const LatLng(45.521563, -122.677433);
+  final homeCamera = CameraPosition(
+    target: LatLng(12.960632, 77.641603),
+    zoom: 15.0,
+  );
+
+  Map<MarkerId, Marker> markers = <MarkerId, Marker>{};
 
   Restaurants() {
+    markers = <MarkerId, Marker>{};
+    firstMarker();
     geo = Geoflutterfire();
-    GeoFirePoint center = geo.point(latitude: 12.960632, longitude: 77.641603);
+    // GeoFirePoint center = geo.point(latitude: 12.960632, longitude: 77.641603);
+  }
+
+  firstMarker(){
+    MarkerId markerId = MarkerId(center.latitude.toString() +
+        center.longitude.toString());
+    final marker = Marker(
+      markerId: markerId,
+      position: center,
+      infoWindow: InfoWindow(
+        title: "name",
+        snippet: "address",
+      ),
+      icon: BitmapDescriptor.defaultMarker,
+      onTap: () {
+        var x = 0;
+      },
+    );
+    markers[markerId] = marker;
   }
 
   init() {
