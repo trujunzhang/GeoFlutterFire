@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:ieatta/GeoFlutterFire/point.dart';
 import 'package:ieatta/GeoFlutterFire/geoflutterfire.dart';
 import 'package:rxdart/rxdart.dart';
@@ -9,6 +10,8 @@ class Restaurants {
   Geoflutterfire geo;
   Stream<List<DocumentSnapshot>> stream;
   var radius = BehaviorSubject<double>.seeded(1.0);
+
+  final LatLng center = const LatLng(45.521563, -122.677433);
 
   Restaurants() {
     geo = Geoflutterfire();
