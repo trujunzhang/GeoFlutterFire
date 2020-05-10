@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:ieatta/src/models/restaurant.dart';
 import 'package:ieatta/src/services/restaurants.dart';
 
 class RestaurantsPageView extends StatefulWidget {
@@ -14,7 +15,26 @@ class _RestaurantsPageViewState extends State<RestaurantsPageView> {
     return StreamBuilder(
         stream: restaurants.restaurantsStream(),
         builder: (context, snapshot) {
-          if (snapshot.hasData) {}
+          if (snapshot.hasData) {
+            List<Restaurant> restaurants = snapshot.data;
+            if (restaurants.isNotEmpty) {
+              return Container(
+                child: Center(
+                  child: Text(restaurants.length.toString(),
+                 style: TextStyle(
+                   fontSize: 24
+                 ),
+                  ),
+                ),
+              );
+            } else {
+              return Container(
+                child: Center(
+                  child: Text('Empty list!'),
+                ),
+              );
+            }
+          }
           return Center(child: CircularProgressIndicator());
         });
   }
