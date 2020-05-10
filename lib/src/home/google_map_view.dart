@@ -4,8 +4,7 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import '../services/restaurants.dart';
 
 class GoogleMapView extends StatefulWidget {
-  GoogleMapView({Key key })
-      : super(key: key);
+  GoogleMapView({Key key}) : super(key: key);
 
   @override
   _GoogleMapViewState createState() => _GoogleMapViewState();

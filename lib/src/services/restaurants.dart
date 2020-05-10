@@ -2,9 +2,14 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:ieatta/GeoFlutterFire/point.dart';
 import 'package:ieatta/GeoFlutterFire/geoflutterfire.dart';
+import 'package:ieatta/src/models/restaurant.dart';
 import 'package:rxdart/rxdart.dart';
 
+import 'firestore_service.dart';
+
 class Restaurants {
+  final _firestoreService = FirestoreService.instance;
+
   // firestore init
   Firestore _firestore = Firestore.instance;
   Geoflutterfire geo;
@@ -26,9 +31,9 @@ class Restaurants {
     // GeoFirePoint center = geo.point(latitude: 12.960632, longitude: 77.641603);
   }
 
-  firstMarker(){
-    MarkerId markerId = MarkerId(center.latitude.toString() +
-        center.longitude.toString());
+  firstMarker() {
+    MarkerId markerId =
+        MarkerId(center.latitude.toString() + center.longitude.toString());
     final marker = Marker(
       markerId: markerId,
       position: center,
@@ -93,6 +98,13 @@ class Restaurants {
 
   void dispose() {
     radius.close();
+  }
+
+  Stream<List<Restaurant>> restaurantsStream() {
+    return _firestoreService.collectionStream(
+      path: 'restaurants',
+      builder: (data, documentId) => Restaurant.fromMap(data, documentId),
+    );
   }
 }
 
