@@ -14,26 +14,28 @@ class _MyAppState extends State<MyApp> {
   TextEditingController _latitudeController, _longitudeController;
 
   Map<MarkerId, Marker> markers = <MarkerId, Marker>{};
-  final marker = Marker(
-    markerId: MarkerId("name"),
-    position: restaurants.center,
-    infoWindow: InfoWindow(
-      title: "name",
-      snippet: "address",
-    ),
-    icon: BitmapDescriptor.defaultMarker,
-    onTap: () {
-      var x = 0;
-    },
-  );
+
   @override
   void initState() {
     super.initState();
     _latitudeController = TextEditingController();
     _longitudeController = TextEditingController();
 
-    MarkerId id = MarkerId(restaurants.center.latitude.toString() + restaurants.center.longitude.toString());
-    markers[id] = marker;
+    MarkerId markerId = MarkerId(restaurants.center.latitude.toString() +
+        restaurants.center.longitude.toString());
+    final marker = Marker(
+      markerId: markerId,
+      position: restaurants.center,
+      infoWindow: InfoWindow(
+        title: "name",
+        snippet: "address",
+      ),
+      icon: BitmapDescriptor.defaultMarker,
+      onTap: () {
+        var x = 0;
+      },
+    );
+    markers[markerId] = marker;
 
     restaurants.init();
   }
