@@ -1,9 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:ieatta/GeoFlutterFire/geoflutterfire.dart';
-import 'package:ieatta/GeoFlutterFire/point.dart';
-
 import 'services/restaurants.dart';
 import 'streambuilder_test.dart';
 
@@ -16,7 +13,6 @@ class _MyAppState extends State<MyApp> {
   GoogleMapController _mapController;
   TextEditingController _latitudeController, _longitudeController;
 
-  Restaurants restaurants = Restaurants();
   Map<MarkerId, Marker> markers = <MarkerId, Marker>{};
 
   @override
@@ -154,18 +150,18 @@ class _MyAppState extends State<MyApp> {
         body: Stack(
           children: <Widget>[
             mapLayer,
-    Container(
-    child: Column(
-      children: <Widget>[
-        Spacer(),
-        Container(
-          color: Colors.white,
-          height: 240,
-        )
-      ],
-    ),
-    ),
-    Container(
+            Container(
+              child: Column(
+                children: <Widget>[
+                  Spacer(),
+                  Container(
+                    color: Colors.white,
+                    height: 240,
+                  )
+                ],
+              ),
+            ),
+            Container(
               margin: const EdgeInsets.only(bottom: 60),
               child: fgLayer,
             )

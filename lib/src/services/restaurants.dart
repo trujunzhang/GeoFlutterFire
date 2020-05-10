@@ -66,3 +66,5 @@ class Restaurants {
     radius.close();
   }
 }
+
+Restaurants restaurants = Restaurants();
